@@ -4,23 +4,16 @@ FROM ubuntu:18.04
 # Set working directory
 WORKDIR /usr/src/mobidb
 
-# Make tests directory
-RUN mkdir ./dockertest
-# Copy test notebook into remote test folder
-COPY ./test.ipynb ./dockertest/test.ipynb
-# Copy data folder into remote test folder
-COPY ./data ./dockertest/data
-
 # Install python
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3.7 python3-pip python3-setuptools python3-wheel \
+    python3.7 python3-pip \
     python2.7 python-pip \
     git && \
     apt-get clean  && \
     apt-get autoremove
 
 # Install required python packages
-RUN pip3 install wheel numpy notebook matplotlib tqdm
+RUN pip3 install numpy
 
 # # Retrieve remote mobidb folder (from Interproscan repository)
 # RUN git clone https://github.com/ebi-pf-team/interproscan && \
@@ -37,6 +30,3 @@ RUN git clone https://github.com/BioComputingUP/MobiDB-lite.git && \
 
 # # Retrieve local mobidb folder
 # COPY path/to/mobidb ./
-
-# Instantiate new notebook
-CMD /bin/bash -c "jupyter notebook --ip='*' --port=8888 --no-browser --allow-root ./dockertest/test.ipynb"
