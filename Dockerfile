@@ -5,11 +5,11 @@ FROM ubuntu:18.04
 WORKDIR /usr/src/mobidb
 
 # Make tests directory
-RUN mkdir ./test
+RUN mkdir ./dockertest
 # Copy test notebook into remote test folder
-COPY ./test.ipynb ./test/test.ipynb
+COPY ./test.ipynb ./dockertest/test.ipynb
 # Copy data folder into remote test folder
-COPY ./data ./test/data
+COPY ./data ./dockertest/data
 
 # Install python
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -22,16 +22,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install required python packages
 RUN pip3 install wheel numpy notebook matplotlib tqdm
 
-# Retrieve remote mobidb folder
-RUN git clone https://github.com/ebi-pf-team/interproscan && \
-    mv ./interproscan/core/jms-implementation/support-mini-x86-32/bin/mobidb/2.0/* ./ && \  # Uncomment for version 2.0
-#     mv ./interproscan/core/jms-implementation/support-mini-x86-32/bin/mobidb/1.5/* ./ && \  # Uncomment for version 1.5
-#     mv ./interproscan/core/jms-implementation/support-mini-x86-32/bin/mobidb/1.0/* ./ && \  # Uncomment for version 1.0
-    mv ./interproscan/core/jms-implementation/src/test/resources/data/mobidb/1.0/test_mobidb_seqs.fasta  ./test/sequences.fasta && \
-    rm -r ./interproscan
+# # Retrieve remote mobidb folder (from Interproscan repository)
+# RUN git clone https://github.com/ebi-pf-team/interproscan && \
+#     mv ./interproscan/core/jms-implementation/support-mini-x86-32/bin/mobidb/2.0/* ./ && \  # Uncomment for version 2.0
+# #     mv ./interproscan/core/jms-implementation/support-mini-x86-32/bin/mobidb/1.5/* ./ && \  # Uncomment for version 1.5
+# #     mv ./interproscan/core/jms-implementation/support-mini-x86-32/bin/mobidb/1.0/* ./ && \  # Uncomment for version 1.0
+#     mv ./interproscan/core/jms-implementation/src/test/resources/data/mobidb/1.0/test_mobidb_seqs.fasta  ./test/sequences.fasta && \
+#     rm -r ./interproscan
+
+# Retrieve remove mobidb folder (from MobiDB Lite repository)
+RUN git clone https://github.com/BioComputingUP/MobiDB-lite.git && \
+    mv ./MobiDB-lite/* ./ && \
+    rm -r ./MobiDB-lite
 
 # # Retrieve local mobidb folder
 # COPY path/to/mobidb ./
 
 # Instantiate new notebook
-CMD /bin/bash -c "jupyter notebook --ip='*' --port=8888 --no-browser --allow-root ./test/test.ipynb"
+CMD /bin/bash -c "jupyter notebook --ip='*' --port=8888 --no-browser --allow-root ./dockertest/test.ipynb"
